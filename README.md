@@ -1,63 +1,69 @@
-# AES-Advanced-Encryption-Standard
-Chuẩn mã hóa tiên tiến AES (Advanced Encryption Standard) là thuật toán mã hóa khối đối xứng được Viện Tiêu chuẩn và Công nghệ Quốc gia Hoa Kỳ (NIST) ban hành để thay thế cho tiêu chuẩn DES đã lỗi thời. AES xử lý các khối dữ liệu cố định có kích thước 128-bit (16 byte) dựa trên các khóa mật mã có độ dài 128, 192, hoặc 256-bit. Do đặc thù của mật mã đối xứng, hệ thống sử dụng chung một khóa bí mật (Cipher Key) cho cả quy trình mã hóa (Encryption) và giải mã (Decryption).
-Để áp dụng mã khối AES vào luồng dữ liệu thực tế, nhóm đề tài hướng tới hiện thực cấu trúc đa chế độ hoạt động bao gồm:
-1.	Chế độ ECB (Electronic Code Book): Mã hóa và giải mã các khối dữ liệu một cách độc lập hoàn toàn.
-2.	Chế độ CBC (Cipher Block Chaining): Khối rõ trước khi mã hóa được cộng XOR với khối mã của bước ngay trước đó. Chế độ này bắt buộc sử dụng một Véc-tơ khởi tạo (IV) có kích thước 128-bit để làm mờ khối đầu tiên.
-3.	Chế độ CFB (Cipher Feedback): Biến mã khối thành mã dòng bằng cách hồi tiếp bản mã của khối trước đó vào bộ mã hóa, sau đó lấy kết quả XOR với khối rõ hiện tại.
-4.	Chế độ OFB (Output Feedback): Tạo ra chuỗi khóa dòng độc lập với bản rõ bằng cách mã hóa lặp lại véc-tơ khởi tạo IV, sau đó lấy chuỗi khóa này XOR với bản rõ để tạo bản mã.
-5.	Chế độ CTR (Counter Mode): Hoạt động như một hệ mật mã dòng bằng cách mã hóa một bộ đếm (Counter) kết hợp giữa IV và số đếm tăng dần qua mỗi khối, sau đó XOR với bản rõ. Chế độ này tối ưu tốt nhất cho phần cứng nhờ tính song song tuyệt đối.
-Định hướng thiết kế: Nhóm quyết định hiện thực hệ thống SoC tăng tốc phần cứng đa chức năng, hỗ trợ cả 3 độ dài khóa (128/192/256-bit) và tích hợp đồng bộ cả 5 chế độ hoạt động nêu trên (ECB, CBC, CFB, OFB, CTR).
+# 🛡️ SoC Hardware Accelerator for Advanced Encryption Standard (AES)
 
-I. Kiến trúc
-1. IP AES
+[![Platform - Intel Cyclone / Arria / Stratix](https://img.shields.io/badge/Platform-Intel_FPGA-blue.svg)]()
+[![Processor - Nios II Soft-core](https://img.shields.io/badge/Processor-Nios_II-orange.svg)]()
+[![Bus - Avalon-MM](https://img.shields.io/badge/Bus-Avalon--MM-green.svg)]()
+[![Language - Verilog / C](https://img.shields.io/badge/Language-Verilog_%2F_C-red.svg)]()
 
-<img width="407" height="482" alt="image" src="https://github.com/user-attachments/assets/7f1a6d4c-3929-48e0-a40f-82352181eed2" />
+## 📌 Tổng quan dự án
+Dự án nghiên cứu và hiện thực hóa **Hệ thống SoC tăng tốc phần cứng đa chức năng cho thuật toán mã hóa khối đối xứng AES** (Advanced Encryption Standard). 
 
-2. Avalon-MM Bus
+Hệ thống được tích hợp trên nền tảng FPGA sử dụng vi xử lý lõi mềm **Nios II**, kết nối qua hệ thống bus **Avalon-MM** và tăng tốc toàn diện bằng hai kênh bộ truyền dữ liệu trực tiếp **DMA**.
 
-<img width="655" height="348" alt="image" src="https://github.com/user-attachments/assets/bc475153-8628-458b-b135-de8025435ff5" />
+### 🌟 Tính năng cốt lõi:
+* **Đa độ dài khóa:** Hỗ trợ linh hoạt cả 3 cấu hình khóa chuẩn mã hóa: **128-bit, 192-bit, và 256-bit**.
+* **Đa chế độ hoạt động (Multi-mode):** Tích hợp đồng bộ cả 5 chế độ hoạt động chuẩn NIST nhằm đáp ứng các luồng dữ liệu thực tế:
+  1. **ECB (Electronic Code Book):** Mã hóa/giải mã các khối dữ liệu độc lập hoàn toàn.
+  2. **CBC (Cipher Block Chaining):** Cộng XOR khối rõ với khối mã trước đó, làm mờ bằng Vector khởi tạo (IV) 128-bit.
+  3. **CFB (Cipher Feedback):** Hồi tiếp bản mã khối trước vào bộ mã hóa để biến mã khối thành mã dòng.
+  4. **OFB (Output Feedback):** Mã hóa liên tục IV để tạo chuỗi khóa dòng độc lập với bản rõ.
+  5. **CTR (Counter Mode):** Mã hóa bộ đếm (Counter + IV), tối ưu hóa kiến trúc phần cứng nhờ **tính song song tuyệt đối**.
 
-a) Nios II (Vi xử lý trung tâm): 
-Đây là vi xử lý lõi mềm (soft-core) được cấu hình trực tiếp trên các khối logic của chip FPGA, Nios II chịu trách nhiệm thực thi mã lệnh chương trình (C/C++), điều phối luồng ffffdữ liệu, xử lý các tín hiệu ngắt (interrupts) và quản lý hoạt động của tất cả các khối ngoại vi còn lại. Trong hệ thống này, Nios II đóng vai trò là thiết bị chủ (Master).
+---
 
-b) Avalon-MM (Avalon Memory-Mapped Interface): 
-Đây là hệ thống bus giao tiếp trung tâm, đóng vai trò kết nối tất cả các thành 
-phần trong hệ thống với nhau. Thông qua cơ chế định vị địa chỉ bộ nhớ (Memory-Mapped), Nios II có thể kết nối và điều khiển các khối ngoại vi (như DMA, Timer, AES) thông qua các địa chỉ cụ thể. Hệ thống bus này tự động xử lý các lệnh đọc/ghi dữ liệu, phân chia quyền ưu tiên truy cập và định tuyến luồng thông tin giữa thiết bị Master và Slave.
+## 🏗️ Kiến trúc hệ thống (System Architecture)
 
-c) On-Chip Memory (Bộ nhớ nội): 
-Khối RAM/ROM này được khởi tạo từ chính tài nguyên bộ nhớ có sẵn trên chip FPGA (như các khối Block RAM). Bộ nhớ này được dùng để lưu trữ mã lệnh cho vi xử lý thực thi, đồng thời làm nơi chứa dữ liệu tạm thời (Data Memory, Stack, Heap). Nhờ được tích hợp ngay trên chip nên tốc độ truy xuất dữ liệu giữa Nios II và bộ nhớ này cực kỳ nhanh.
+### 1. IP AES Core
+Khối tính toán chuyên dụng xử lý thuật toán mã hóa và giải mã tuần tự/song song bằng phần cứng dưới dạng IP thuần cấu trúc mạch logic.
 
-d) AES (Khối mã hóa phần cứng): 
-Đây là một khối IP chuyên dụng được thiết kế để xử lý thuật toán mã hóa và giải mã theo chuẩn AES bằng phần cứng. Việc đưa thuật toán AES xuống xử lý độc lập bằng phần cứng giúp hệ thống tránh được tình trạng quá tải, vì nếu chạy bằng phần mềm trên Nios II sẽ rất tốn thời gian và tài nguyên CPU. Nios II chỉ cần chuyển dữ liệu thô vào đây, khối AES sẽ xử lý song song với tốc độ cao rồi trả lại kết quả, giúp tối ưu hiệu suất cho các ứng dụng bảo mật.
+<img src="https://github.com/user-attachments/assets/7f1a6d4c-3929-48e0-a40f-82352181eed2" width="450" alt="AES IP Core Architecture"/>
 
-e) JTAG - UART:
-Đây là giao tiếp nối tiếp phục vụ chủ yếu cho quá trình gỡ lỗi (debug) và tương tác với người dùng. Khối này cho phép vi xử lý truyền các chuỗi ký tự (ví dụ qua hàm printf trong ngôn ngữ C) qua cáp JTAG để hiển thị lên màn hình máy tính (thông qua phần mềm Nios II SBT for Eclipse). Nhờ đó, người lập trình có thể theo dõi trạng thái hoạt động của hệ thống.
+### 2. Sơ đồ kết nối Bus Avalon-MM
+Hệ thống SoC được thiết kế theo mô hình Master-Slave thông qua kết nối bus phân vị địa chỉ bộ nhớ (Memory-Mapped).
 
-f) Timer (Bộ định thời): 
-Là khối đếm thời gian bằng phần cứng, giúp vi xử lý đo lường các khoảng thời gian hoặc tạo độ trễ (delay) chính xác. Timer cũng được dùng để tạo ra các tín hiệu ngắt định kỳ (timer interrupts). Thành phần này rất quan trọng khi hệ thống cần chạy hệ điều hành thời gian thực (RTOS) hoặc cần thực hiện các tác vụ lặp lại theo chu kỳ.
+<img src="https://github.com/user-attachments/assets/bc475153-8628-458b-b135-de8025435ff5" width="650" alt="Avalon-MM Bus Topology"/>
 
-g) DMA_0 & DMA_1 (Truy cập bộ nhớ trực tiếp): 
-Hai khối này chịu trách nhiệm di chuyển các khối dữ liệu dung lượng lớn giữa bộ nhớ nội và các ngoại vi (như khối AES) một cách tự động. Quá trình này diễn ra hoàn toàn độc lập và không cần sự can thiệp liên tục từ vi xử lý Nios II. Việc trang bị hai bộ DMA cho phép hệ thống truyền nhận dữ liệu song song: một bộ chuyên đẩy dữ liệu thô vào khối AES và bộ còn lại đồng thời lấy dữ liệu đã mã hóa trả về bộ nhớ. Cơ chế này giúp giải phóng hoàn toàn băng thông cho CPU để tập trung xử lý các công việc quản lý khác, từ đó tối ưu hiệu suất tổng thể của hệ thống.
+#### Detailed Components:
+* **Nios II (Vi xử lý trung tâm):** Lõi mềm xử lý (Master) thực thi mã lệnh điều phối (C/C++), quản lý ngắt và cấu hình các ngoại vi.
+* **Avalon-MM (Avalon Memory-Mapped Interface):** Bus trung tâm tự động phân quyền ưu tiên, xử lý các lệnh đọc/ghi dữ liệu từ Master tới các Slave.
+* **On-Chip Memory (Bộ nhớ nội):** Khởi tạo từ tài nguyên Block RAM nội bộ của FPGA, lưu trữ mã lệnh chương trình (Stack, Heap) với tốc độ truy xuất cực cao.
+* **AES Hardware Accelerator:** Khối IP tăng tốc phần cứng độc lập, giải phóng năng lực xử lý cho Nios II Core khi gặp tác vụ mã hóa nặng.
+* **JTAG - UART:** Giao tiếp nối tiếp kết nối với máy tính phục vụ công tác gỡ lỗi (Debug, `printf()`) thời gian thực thông qua Nios II SBT for Eclipse.
+* **Timer (Bộ định thời):** Đo lường khoảng thời gian chính xác, tạo delay hệ thống và cấp tín hiệu ngắt định kỳ cho định thời hệ thống.
+* **Dual-DMA (DMA_0 & DMA_1):** Cơ chế truy cập bộ nhớ trực tiếp kép. Một bộ chuyên đẩy dữ liệu thô vào IP AES và một bộ đồng thời lấy dữ liệu mã hóa trả lại RAM, chạy song song độc lập với CPU giúp tối ưu hóa tối đa băng thông.
 
-3. Qsys
+### 3. Thiết kế hệ thống trên Platform Designer (Qsys)
+Cấu hình kết nối phần cứng thực tế giữa vi xử lý Nios II, Bộ nhớ RAM nội bộ, các kênh DMA và IP Hardware Core của thuật toán AES.
 
-<img width="965" height="536" alt="image" src="https://github.com/user-attachments/assets/d8856eef-7f64-4f11-a78e-c8b496f0ddb4" />
+<img src="https://github.com/user-attachments/assets/d8856eef-7f64-4f11-a78e-c8b496f0ddb4" width="900" alt="Qsys Design Hardware"/>
 
-II. Tài nguyên hệ thống
+---
 
-<img width="1034" height="523" alt="image" src="https://github.com/user-attachments/assets/6929f5b4-786b-4c81-a132-5d08017ae765" />
+## 📊 Kết quả thực nghiệm trên KIT FPGA
 
-III. So sánh kết quả nạp KIT giữa AES phần mềm và phần cứng
-1. Phần mềm
+### 1. Tài nguyên hệ thống tiêu thụ (Resource Utilization)
+Báo cáo chi tiết sau khi thực hiện quá trình Tổng hợp mạch (Synthesis) và Định tuyến (Fitting/Routing):
 
-<img width="1034" height="409" alt="image" src="https://github.com/user-attachments/assets/da27f6a9-67c4-4556-a7e1-d6206a0f284c" />
+<img src="https://github.com/user-attachments/assets/6929f5b4-786b-4c81-a132-5d08017ae765" width="900" alt="Fitter Resource Utilization Report"/>
 
-3. Phần cứng
+### 2. So sánh hiệu năng: Mã hóa bằng Phần mềm vs Tăng tốc Phần cứng
 
-<img width="946" height="286" alt="image" src="https://github.com/user-attachments/assets/09e6be77-f7a9-45db-8d46-1b4bc92e5443" />
+> 🚀 **Kết luận thực nghiệm:** Quá trình đo đạc thời gian xử lý thực tế trên KIT cho thấy bộ tăng tốc phần cứng **(Hardware Accelerator)** đem lại tốc độ vượt trội gấp **hơn 150 lần** ($\approx 150\times \text{ Speedup}$) so với việc xử lý hoàn toàn bằng mã nguồn phần mềm thuần túy trên CPU lõi mềm.
 
-* Kết luận: Speedup khoảng trên 150 lần
+#### Khởi chạy thuật toán bằng Phần mềm (Software Execution):
+* Thực thi tuần tự trên tập lệnh của Nios II CPU, tiêu tốn lượng lớn chu kỳ xung nhịp cho mỗi vòng lặp mã hóa.
+<img src="https://github.com/user-attachments/assets/da27f6a9-67c4-4556-a7e1-d6206a0f284c" width="900" alt="Software Execution Performance"/>
 
-
-
-
+#### Khởi chạy bằng Bộ tăng tốc Phần cứng (Hardware-Accelerated):
+* Dữ liệu luân chuyển trực tiếp thông qua Dual-DMA kết hợp tính toán song song tại tầng cấu trúc RTL giúp giảm thiểu tối đa độ trễ.
+<img src="https://github.com/user-attachments/assets/6929f5b4-786b-4c81-a132-5d08017ae765" width="900" alt="Hardware Execution Performance"/>
