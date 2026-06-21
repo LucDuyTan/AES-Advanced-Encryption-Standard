@@ -7,4 +7,4 @@ Chuẩn mã hóa tiên tiến AES (Advanced Encryption Standard) là thuật to�
 4.	Chế độ OFB (Output Feedback): Tạo ra chuỗi khóa dòng độc lập với bản rõ bằng cách mã hóa lặp lại véc-tơ khởi tạo IV, sau đó lấy chuỗi khóa này XOR với bản rõ để tạo bản mã.
 5.	Chế độ CTR (Counter Mode): Hoạt động như một hệ mật mã dòng bằng cách mã hóa một bộ đếm (Counter) kết hợp giữa IV và số đếm tăng dần qua mỗi khối, sau đó XOR với bản rõ. Chế độ này tối ưu tốt nhất cho phần cứng nhờ tính song song tuyệt đối.
 Định hướng thiết kế: Nhóm quyết định hiện thực hệ thống SoC tăng tốc phần cứng đa chức năng, hỗ trợ cả 3 độ dài khóa (128/192/256-bit) và tích hợp đồng bộ cả 5 chế độ hoạt động nêu trên (ECB, CBC, CFB, OFB, CTR).
-![Uploading image.png…]()
+
