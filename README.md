@@ -20,7 +20,7 @@ Chuẩn mã hóa tiên tiến AES (Advanced Encryption Standard) là thuật to�
 
 <img width="407" height="482" alt="image" src="https://github.com/user-attachments/assets/7f1a6d4c-3929-48e0-a40f-82352181eed2" />
 
-* ** 
+* ** Kiến trúc được sử dụng là Kiến trúc vòng lặp, tái sử dụng logic, giảm tài nguyên phần cứng, giúp tiết kiệm điện năng tiêu thụ.
 
 ### 2. Avalon-MM Bus
 
