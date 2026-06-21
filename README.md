@@ -10,6 +10,7 @@ Chuẩn mã hóa tiên tiến AES (Advanced Encryption Standard) là thuật to�
 I. Kiến trúc
 1. IP AES
 <img width="407" height="482" alt="image" src="https://github.com/user-attachments/assets/7f1a6d4c-3929-48e0-a40f-82352181eed2" />
+
 2. Avalon-MM Bus
 <img width="655" height="348" alt="image" src="https://github.com/user-attachments/assets/bc475153-8628-458b-b135-de8025435ff5" />
 a) Nios II (Vi xử lý trung tâm): 
