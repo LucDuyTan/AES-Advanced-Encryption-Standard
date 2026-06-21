@@ -54,4 +54,5 @@ Chuẩn mã hóa tiên tiến AES (Advanced Encryption Standard) là thuật to�
 
 <img width="946" height="286" alt="image" src="https://github.com/user-attachments/assets/09e6be77-f7a9-45db-8d46-1b4bc92e5443" />
 
+
 * **Kết luận:** Speedup khoảng trên 150 lần
